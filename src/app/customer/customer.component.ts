@@ -12,6 +12,19 @@ function ratingRange(min: number, max: number): ValidatorFn {
   }
 }
 
+function emailMatcher(control: AbstractControl): { [key: string]: boolean } | null {
+    const emailControl = control.get('email');
+    const confirmEmailControl = control.get('confirmEmail');
+    
+    if (emailControl.pristine || confirmEmailControl.pristine) {
+      return null;
+    }
+
+    return emailControl.value === confirmEmailControl.value ?
+      null:
+      { 'match': true };
+}
+
 @Component({
   selector: 'customer',
   templateUrl: './customer.component.html',
@@ -27,7 +40,10 @@ export class CustomerComponent implements OnInit {
     this.customerForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(3)]],
       lastName: ['', [Validators.required, Validators.maxLength(50)]],
-      email: ['', [Validators.required, Validators.email]],
+      emailGroup: this.fb.group({
+        email: ['', [Validators.required, Validators.email]],
+        confirmEmail: ['', Validators.required],
+      }, {validator: emailMatcher}),
       phone: '',
       notification: 'email',
       rating: [null,ratingRange(1,5)],
@@ -54,9 +70,13 @@ export class CustomerComponent implements OnInit {
     this.customerForm.setValue({
       firstName: 'Adam',
       lastName: 'Abdelhamid',
-      email: 'abdelhamid@helloworld.com',
+      emailGroup:{
+        email: 'abdelhamid@helloworld.com',
+        confirmEmail: 'abdlhamid@helloworld.com',
+      },
       notification: 'text',
       phone: '123456789',
+      rating: 3,
       sendCatalog: false
     });
   }
