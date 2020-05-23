@@ -63,6 +63,7 @@ export class CustomerComponent implements OnInit {
       notification: 'email',
       rating: [null,ratingRange(1,5)],
       sendCatalog: false,
+      addresses: this.buildAddress()
     });
 
     // change validation according notification ways
@@ -89,6 +90,17 @@ export class CustomerComponent implements OnInit {
       phoneControl.clearValidators();
     }
     phoneControl.updateValueAndValidity();
+  }
+
+  buildAddress(): FormGroup {
+    return this.fb.group({
+      addressType: 'home',
+      street1: '',
+      street2: '',
+      city: '',
+      state: '',
+      zip:''
+    });
   }
 
   /**
