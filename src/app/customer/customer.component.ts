@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
 import { Customer } from '../customer';
-
+import { debounceTime } from 'rxjs/operators';
+/**
+ * a factory function for a custom validaation for value in range
+ * @param min minimum value of range
+ * @param max maximum value of range
+ */
 function ratingRange(min: number, max: number): ValidatorFn {
   return (control: AbstractControl): { [key: string]: boolean } | null => {
     const { value } = control;
@@ -12,6 +17,10 @@ function ratingRange(min: number, max: number): ValidatorFn {
   }
 }
 
+/**
+ * custom validator for cross-field validation for maching mail values
+ * @param control form group container
+ */
 function emailMatcher(control: AbstractControl): { [key: string]: boolean } | null {
     const emailControl = control.get('email');
     const confirmEmailControl = control.get('confirmEmail');
@@ -33,6 +42,12 @@ function emailMatcher(control: AbstractControl): { [key: string]: boolean } | nu
 export class CustomerComponent implements OnInit {
   customerForm: FormGroup;
   customer = new Customer();
+  emailMessage: string;
+
+  private validationMessages = {
+    required: 'Please enter your email address.',
+    email: 'Please enter a valid email address.',
+  };
 
   constructor(private fb: FormBuilder) { }
 
@@ -54,6 +69,11 @@ export class CustomerComponent implements OnInit {
     this.customerForm.get('notification').valueChanges.subscribe(
       value => this.setNotification(value)
     );
+
+    const emailControl = this.customerForm.get('emailGroup.email');
+    emailControl.valueChanges
+      .pipe(debounceTime(1000))
+      .subscribe(value => this.setMessage(emailControl));
   }
 
   save() {
@@ -70,6 +90,19 @@ export class CustomerComponent implements OnInit {
     }
     phoneControl.updateValueAndValidity();
   }
+
+  /**
+   * 
+   * @param c 
+   */
+  setMessage(c: AbstractControl): void {
+    this.emailMessage = '';
+    if ((c.touched || c.dirty) && c.errors) {
+      this.emailMessage = Object.keys(c.errors).map(
+        key => this.validationMessages[key]).join(' ');
+    }
+  }
+
 
   populateTestData() {
     this.customerForm.setValue({
