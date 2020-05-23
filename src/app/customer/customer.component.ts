@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn, FormArray } from '@angular/forms';
 import { Customer } from '../customer';
 import { debounceTime } from 'rxjs/operators';
 /**
@@ -22,16 +22,16 @@ function ratingRange(min: number, max: number): ValidatorFn {
  * @param control form group container
  */
 function emailMatcher(control: AbstractControl): { [key: string]: boolean } | null {
-    const emailControl = control.get('email');
-    const confirmEmailControl = control.get('confirmEmail');
-    
-    if (emailControl.pristine || confirmEmailControl.pristine) {
-      return null;
-    }
+  const emailControl = control.get('email');
+  const confirmEmailControl = control.get('confirmEmail');
 
-    return emailControl.value === confirmEmailControl.value ?
-      null:
-      { 'match': true };
+  if (emailControl.pristine || confirmEmailControl.pristine) {
+    return null;
+  }
+
+  return emailControl.value === confirmEmailControl.value ?
+    null :
+    { 'match': true };
 }
 
 @Component({
@@ -44,6 +44,9 @@ export class CustomerComponent implements OnInit {
   customer = new Customer();
   emailMessage: string;
 
+  get addresses(): FormArray{
+    return <FormArray>this.customerForm.get('addresses');
+  }
   private validationMessages = {
     required: 'Please enter your email address.',
     email: 'Please enter a valid email address.',
@@ -58,12 +61,12 @@ export class CustomerComponent implements OnInit {
       emailGroup: this.fb.group({
         email: ['', [Validators.required, Validators.email]],
         confirmEmail: ['', Validators.required],
-      }, {validator: emailMatcher}),
+      }, { validator: emailMatcher }),
       phone: '',
       notification: 'email',
-      rating: [null,ratingRange(1,5)],
+      rating: [null, ratingRange(1, 5)],
       sendCatalog: false,
-      addresses: this.buildAddress()
+      addresses: this.fb.array([this.buildAddress()])
     });
 
     // change validation according notification ways
@@ -99,7 +102,7 @@ export class CustomerComponent implements OnInit {
       street2: '',
       city: '',
       state: '',
-      zip:''
+      zip: ''
     });
   }
 
@@ -120,7 +123,7 @@ export class CustomerComponent implements OnInit {
     this.customerForm.setValue({
       firstName: 'Adam',
       lastName: 'Abdelhamid',
-      emailGroup:{
+      emailGroup: {
         email: 'abdelhamid@helloworld.com',
         confirmEmail: 'abdlhamid@helloworld.com',
       },
