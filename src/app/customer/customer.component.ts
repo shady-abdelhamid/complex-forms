@@ -95,6 +95,9 @@ export class CustomerComponent implements OnInit {
     phoneControl.updateValueAndValidity();
   }
 
+  /**
+   * build empty address formGroup
+   */
   buildAddress(): FormGroup {
     return this.fb.group({
       addressType: 'home',
@@ -104,6 +107,13 @@ export class CustomerComponent implements OnInit {
       state: '',
       zip: ''
     });
+  }
+
+  /**
+   * add additional address
+   */
+  public addAddress(): void {
+   this.addresses.push(this.buildAddress());
   }
 
   /**
