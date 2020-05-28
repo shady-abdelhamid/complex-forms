@@ -1,0 +1,24 @@
+{
+    "firstName": {
+        "required": "Please enter your first name.",
+        "minlength": "The first name must be longer than 3 characters."
+    },
+    "lastName": {
+        "required": "Please enter your last name.",
+        "maxlength": "The last name must be less than 50 characters."
+    },
+    "email": {
+        "required": "Please enter your email address.",
+        "email": "Please enter a valid email address."
+    },
+    "confirmEmail": {
+        "required": "Please confirm your email address.",
+        "match": "The confirmation does not match email address."
+    },
+    "phone": {
+        "required": "Please enter your phone number."
+    },
+    "rating": {
+        "range": "Please rate your experience from 1 to 5."
+    }
+}
